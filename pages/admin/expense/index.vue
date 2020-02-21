@@ -11,7 +11,7 @@
         <div class="col-sm-6">
             <div class="white-box">
                 <h3 class="box-title">Expense Table <span style="float: right;">{{ date | date }}</span></h3>
-                <Table />
+                <Table @onEndTheDay="endExpenseDay"/>
             </div>
         </div>
         
@@ -31,7 +31,7 @@ export default {
 
     data () {
         return {
-            date: new Date(),
+            date: new Date().toDateString(),
             product: {
                 name: '',
                 price: ''  
@@ -42,8 +42,15 @@ export default {
 
     methods :{
         addItem() {
-            this.$store.commit('addItem', { ...this.product}, this.product) //product is actually item
+            this.$store.commit('addItem', {
+                prodname: this.product.name,
+                prodprice: this.product.price
+            }) //product is actually item
             // console.log("expense says: ", this.product)
+        },
+
+        endExpenseDay () {
+            this.$store.commit('endExpenseDay', this.date)
         }
     }
 
