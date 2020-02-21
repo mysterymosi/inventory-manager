@@ -4,17 +4,19 @@ import Vue from "vue";
 const Cookie = process.client ? require("js-cookie") : undefined;
 const cookieparser = process.server ? require("cookieparser") : undefined;
 
-function loopObj (sum, obj) {
+function loopObj(sum, obj) {
   for (let key in obj) {
-    sum += obj[key]
+    sum += obj[key];
   }
-  return sum
+  return sum;
 }
 
 const createStore = () => {
   return new Vuex.Store({
     state: {
       profile: {},
+      // incomeProducts: {},
+      //INCOME STATES
       products: [
         { prodname: "Beans", prodprice: 1000 },
         { prodname: "Toad", prodprice: 2000 },
@@ -23,15 +25,81 @@ const createStore = () => {
       dailyProductSum: {},
       weeklyProductSum: {},
       monthlyProductSum: {},
-      items: [],
+
+      //EXPENSE STATES
+      items: [
+        { prodname: "Fuel", prodprice: 1000 },
+        { prodname: "Glassware", prodprice: 2000 },
+        { prodname: "Water dispensers", prodprice: 8000 }
+      ],
+      dailyItemSum: {},
+      weeklyItemSum: {},
+      monthlyItemSum: {},
       token: null
     },
 
     mutations: {
-      //income mutations
+      //INCOME MUTATIONS
       addProduct(state, product) {
         state.products.push(product);
         console.log("Products says: ", JSON.stringify(state.products));
+      },
+
+      updateRecentSales (state, payload) {
+        state.products = payload
+      },
+
+      //compute the sum of the price of pruducts for that day
+      endTheDay(state, date) {
+        const items = state.products;
+        const total = items.reduce((acc, item) => (acc += item.prodprice), 0);
+        state.dailyProductSum[date] = total;
+        state.products = [];
+      },
+
+      //compute the sum of the price of products for that week
+      endWeek(state, date) {
+        Vue.set(
+          state.weeklyProductSum,
+          date,
+          loopObj(0, state.dailyProductSum)
+        );
+        console.log("wps says: ", state.weeklyProductSum[date]);
+        // state.dailyProductSum = {}
+      },
+
+      //compute the sum of the price of products for that month
+      endMonth(state, date) {
+        Vue.set(
+          state.monthlyProductSum,
+          date,
+          loopObj(0, state.weeklyProductSum)
+        );
+        console.log("monthly says: ", state.monthlyProductSum[date]);
+        // state.weeklyProductSum = {}
+      },
+
+      //EXPENSE MUTATIONS
+      addItem(state, item) {
+        state.items.push(item);
+        console.log("Item says: ", JSON.stringify(state.items));
+      },
+
+      endExpenseDay(state, date) {
+        var sum = 0;
+        state.items.forEach(item => {
+          sum += item.prodprice;
+        });
+        state.dailyItemSum[date] = sum;
+        console.log("Sum of item price: ", sum);
+      },
+
+      endExpenseWeek(state, date) {
+        Vue.set(state.weeklyItemSum, date, loopObj(0, state.dailyItemSum));
+      },
+
+      endExpenseMonth(state, date) {
+        Vue.set(state.monthlyItemSum, date, loopObj(0, state.weeklyItemSum));
       },
 
       setProfile(state, profile) {
@@ -40,36 +108,8 @@ const createStore = () => {
         }
       },
 
-      //expense mutations
-      addItem(state, item) {
-        state.items.push(item);
-        console.log("Item says: ", JSON.stringify(state.items));
-      },
-
       setToken(state, token) {
         state.token = token;
-      },
-
-      //compute the sum of the price of pruducts for that day
-      endTheDay(state, date) {
-        var sum = 0;
-        state.products.forEach(product => {
-          sum += product.prodprice;
-        });
-        state.dailyProductSum[date] = sum;
-        state.products = [];
-      },
-
-      endWeek(state, date) {
-        Vue.set(state.weeklyProductSum, date, loopObj(0, state.dailyProductSum));
-        console.log("wps says: ", state.weeklyProductSum[date]);
-        state.dailyProductSum = {}
-      },
-
-      endMonth (state, date) {
-        Vue.set(state.monthlyProductSum, date, loopObj(0, state.weeklyProductSum))
-        console.log("monthly says: ", state.monthlyProductSum[date]);
-        state.weeklyProductSum = {}
       }
     },
 
@@ -140,12 +180,9 @@ const createStore = () => {
         return state.profile;
       },
 
+      //INCOME GETTERS
       products(state) {
         return state.products;
-      },
-
-      items(state) {
-        return state.items;
       },
 
       dailyProductSum(state) {
@@ -156,8 +193,25 @@ const createStore = () => {
         return state.weeklyProductSum;
       },
 
-      monthlyProductSum (state) {
+      monthlyProductSum(state) {
         return state.monthlyProductSum;
+      },
+
+      //EXPENSE GETTERS
+      items(state) {
+        return state.items;
+      },
+
+      dailyItemSum(state) {
+        return state.dailyItemSum;
+      },
+
+      weeklyItemSum (state) {
+        return state.weeklyItemSum
+      },
+
+      monthlyItemSum (state) {
+        return state.monthlyItemSum
       }
     }
   });
