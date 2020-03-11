@@ -16390,6 +16390,8 @@ ul.pro-amenities li span i {
     width: 300px;
   }
 }
+
+
 /*Ipad*/
 @media (min-width: 768px) {
   #page-wrapper {
@@ -16412,15 +16414,15 @@ ul.pro-amenities li span i {
   .sidebar:hover {
     width: 240px;
   }
-  .navbar-static-top {
+  /* .navbar-static-top {
     padding-left: 60px;
-  }
+  } */
   .fix-header .navbar-static-top {
     position: fixed;
   }
-  .fix-header #page-wrapper {
+  /* .fix-header #page-wrapper {
     margin-top: 60px;
-  }
+  } */
 }
 .navbar-top-links .dropdown-messages,
 .navbar-top-links .dropdown-tasks,
@@ -16477,6 +16479,7 @@ ul.pro-amenities li span i {
   .navbar-top-links > li:last-child {
     margin-right: 0px;
   }
+  
   .navbar-top-links > li > a {
     padding: 0 12px;
   }
@@ -16561,6 +16564,7 @@ ul.pro-amenities li span i {
     position: fixed;
     top: 0px;
     width: 100%;
+    padding: 0;
   }
   .fix-header #page-wrapper {
     margin-top: 60px;

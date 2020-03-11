@@ -6,11 +6,10 @@
 
 <script>
 export default {
-  middleware: 'check-auth'
-}
+  middleware: "check-auth"
+};
 </script>
 
 <style>
-@import url('~/assets/bootstrap-4.3.1-dist/css/bootstrap.min.css'); 
-
+/* @import url('~/assets/bootstrap-4.3.1-dist/css/bootstrap.min.css');  */
 </style>

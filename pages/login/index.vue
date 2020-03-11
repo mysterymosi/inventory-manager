@@ -35,7 +35,7 @@
           <button type="submit" @click.prevent="login" class="btn btn-success">Submit</button>
         </form>
         <p class="card-text">
-          <router-link to="/signup}">Don't have an account? Sign Up</router-link>
+          <nuxt-link to="/signup">Don't have an account? Sign Up</nuxt-link>
         </p>
       </div>
     </div>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import Header from "~/components/Header";
+import Header from "~/components/NewHeader";
 // import general from "../mixins/general";
 export default {
   components: {
@@ -66,11 +66,11 @@ export default {
         })
         .then(data => {
           this.$router.push("/admin");
-        })
+        });
     }
   }
 
-//   mixins: [general]
+  //   mixins: [general]
 };
 </script>
 

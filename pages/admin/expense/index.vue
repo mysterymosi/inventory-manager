@@ -1,60 +1,116 @@
 <template>
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="white-box">
-                <h3 class="box-title m-b-0">Expense Page</h3>
-                <p class="text-muted m-b-30 font-13"> Enter Item Purchased </p>
-                <AdminForm :product = "product" @handleAdd="addItem"/>
-                
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="white-box">
-                <h3 class="box-title">Expense Table <span style="float: right;">{{ date | date }}</span></h3>
-                <Table @onEndTheDay="endExpenseDay"/>
-            </div>
-        </div>
-        
-    </div> 
+  <div>
+    <SpreadSheet
+      class="col-lg-8 col-md-8"
+      ref="spreadsheet"
+      :toolbar="toolbar"
+      :editLine="editLine"
+      :rowsCount="rowsCount"
+      :colsCount="colsCount"
+      :menu="menu"
+      @onEndDay="endTheDay"
+    />
+    <div class="card col-lg-4 col-md-4">
+      <div class="card-body">
+        <h1 class="card-title">
+          Total Expenses
+          <b>$</b>
+        </h1>
+        <h4 class="card-text">{{ dailyItemSum[date] }}</h4>
+        <AppButton>Go Somewhere</AppButton>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import AdminForm from '~/components/AdminForm'
-import Table from '~/components/Table'
+import SpreadSheet from "~/components/spread";
+import { extractData } from "~/assets/js/util.js";
+import { inputData } from "~/assets/js/util.js";
 
 export default {
-    layout: 'dashboard',
-    components: {
-        AdminForm,
-        Table
+  layout: "dashboard",
+  components: {
+    SpreadSheet
+  },
+  data() {
+    return {
+      toolbar: ["rows", "columns", "lock"],
+      editLine: true,
+      colsCount: 10,
+      rowsCount: 20,
+      menu: true,
+      date: new Date().toDateString()
+    };
+  },
+
+  computed: {
+    dailyItemSum() {
+      return this.$store.getters.dailyItemSum;
     },
 
-    data () {
-        return {
-            date: new Date().toDateString(),
-            product: {
-                name: '',
-                price: ''  
-            }
-            
-        }
-    },
-
-    methods :{
-        addItem() {
-            this.$store.commit('addItem', {
-                prodname: this.product.name,
-                prodprice: this.product.price
-            }) //product is actually item
-            // console.log("expense says: ", this.product)
-        },
-
-        endExpenseDay () {
-            this.$store.commit('endExpenseDay', this.date)
-        }
+    items() {
+      return this.$store.getters.items;
     }
+  },
 
+  methods: {
+    endTheDay() {
+      this.$store.commit("endExpenseDay", this.date);
+    }
+  },
 
-}
+  mounted() {
+    let sheet = this.$refs.spreadsheet;
+    let names = {};
+    let prices = {};
+    let r = 1;
+    // console.log(`this.events says ${this.events}`);
+    // this.$refs.spreadsheet.spreadsheet.setValue("A1", "Product Name");
+    let ins = this;
+    sheet.spreadsheet.events.on("AfterValueChange", function(cell, value) {
+      // console.log(
+      //   "Value of cell " +
+      //     sheet.spreadsheet.selection.getSelectedCell() +
+      //     " has changed to " +
+      //     value
+      // );
+
+      if (r == 2) {
+        if (cell.startsWith("A")) {
+          names[cell] = value;
+          if (prices["B" + cell.substr(1, 1)]) {
+            let prod = {
+              prodname: value,
+              prodprice: prices["B" + cell.substr(1, 1)]
+            };
+            ins.$store.commit("addItem", prod);
+          }
+        }
+
+        if (cell.startsWith("B")) {
+          prices[cell] = value;
+          if (names["A" + cell.substr(1, 1)]) {
+            let prod = {
+              prodname: names["A" + cell.substr(1, 1)],
+              prodprice: value
+            };
+            ins.$store.commit("addItem", prod);
+          }
+        }
+
+        r = 1;
+      } else {
+        r = 2;
+      }
+    });
+
+    sheet.spreadsheet.parse(inputData(this.items, "Item"));
+    sheet.spreadsheet.lock("A1:B1");
+    this.$store.commit("endExpenseDay", this.date);
+  }
+};
 </script>
 
+<style scoped>
+</style>

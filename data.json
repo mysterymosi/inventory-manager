@@ -1,0 +1,19 @@
+[
+    { "cell": "a1", "value": "Country" },
+    { "cell": "b1", "value": "Product" },
+    { "cell": "c1", "value": "Price" },
+    { "cell": "d1", "value": "Amount" },
+    { "cell": "e1", "value": "Total Price" },
+ 
+    { "cell": "a2", "value": "Ecuador" },
+    { "cell": "b2", "value": "Banana" },
+    { "cell": "c2", "value": 6.68},
+    { "cell": "d2", "value": 430 },
+    { "cell": "e2", "value": 2872.4 },
+ 
+    { "cell": "a3", "value": "Belarus" },
+    { "cell": "b3", "value": "Apple" },
+    { "cell": "c3", "value": 3.75},
+    { "cell": "d3", "value": 600 },
+    { "cell": "e3", "value": 2250 }
+]

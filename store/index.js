@@ -1,5 +1,7 @@
 import Vuex from "vuex";
 import Vue from "vue";
+import * as Util from "~/assets/js/util.js";
+
 // import Cookie from "js-cookie";
 const Cookie = process.client ? require("js-cookie") : undefined;
 const cookieparser = process.server ? require("cookieparser") : undefined;
@@ -18,19 +20,20 @@ const createStore = () => {
       // incomeProducts: {},
       //INCOME STATES
       products: [
-        { prodname: "Beans", prodprice: 1000 },
-        { prodname: "Toad", prodprice: 2000 },
-        { prodname: "Rice", prodprice: 3000 }
+        // { prodname: "Beans", prodprice: 1000 },
+        // { prodname: "Toad", prodprice: 2000 },
+        // { prodname: "Rice", prodprice: 3000 }
       ],
+      sortedProducts: [],
       dailyProductSum: {},
       weeklyProductSum: {},
       monthlyProductSum: {},
 
       //EXPENSE STATES
       items: [
-        { prodname: "Fuel", prodprice: 1000 },
-        { prodname: "Glassware", prodprice: 2000 },
-        { prodname: "Water dispensers", prodprice: 8000 }
+        // { prodname: "Fuel", prodprice: 1000 },
+        // { prodname: "Glassware", prodprice: 2000 },
+        // { prodname: "Water dispensers", prodprice: 8000 }
       ],
       dailyItemSum: {},
       weeklyItemSum: {},
@@ -43,18 +46,39 @@ const createStore = () => {
       addProduct(state, product) {
         state.products.push(product);
         console.log("Products says: ", JSON.stringify(state.products));
+        var sum = 0;
+        let date = Util.formattedDate();
+        state.products.forEach(product => {
+          sum += +product.prodprice;
+        });
+        // state.dailyItemSum[date] = sum;
+        Vue.set(state.dailyProductSum, date, sum);
+        console.log("Sum of product price: ", sum);
       },
 
-      updateRecentSales (state, payload) {
-        state.products = payload
+      updateRecentSales(state, payload) {
+        console.log("payload: ", payload);
+        state.products = payload;
+        console.log("state says: ", state.products);
       },
 
       //compute the sum of the price of pruducts for that day
       endTheDay(state, date) {
         const items = state.products;
-        const total = items.reduce((acc, item) => (acc += item.prodprice), 0);
-        state.dailyProductSum[date] = total;
-        state.products = [];
+        let sortedProducts = [];
+        for (let a of items) {
+          if (a.date == date) {
+            sortedProducts.push(a);
+          }
+        }
+        console.log("sorted products from mutations says: ", sortedProducts);
+
+        const total = sortedProducts.reduce(
+          (acc, item) => (acc += +item.prodprice),
+          0
+        );
+        Vue.set(state.dailyProductSum, date, total);
+        console.log("state.dailyProductSum: ", state.dailyProductSum);
       },
 
       //compute the sum of the price of products for that week
@@ -81,16 +105,33 @@ const createStore = () => {
 
       //EXPENSE MUTATIONS
       addItem(state, item) {
+        let date = new Date().toDateString();
         state.items.push(item);
         console.log("Item says: ", JSON.stringify(state.items));
+        var sum = 0;
+        state.items.forEach(item => {
+          sum += +item.prodprice;
+        });
+        // state.dailyItemSum[date] = sum;
+        Vue.set(state.dailyItemSum, date, sum);
+        console.log("Sum of item price: ", sum);
+      },
+
+      updateRecentExpenses(state, payload) {
+        console.log("payload: ", payload);
+        state.items = payload;
+        console.log("state.items says: ", state.items);
       },
 
       endExpenseDay(state, date) {
         var sum = 0;
         state.items.forEach(item => {
-          sum += item.prodprice;
+          let price = +item.prodprice;
+          console.log("price says: ", price);
+          sum += price;
         });
-        state.dailyItemSum[date] = sum;
+        // state.dailyItemSum[date] = sum;
+        Vue.set(state.dailyItemSum, date, sum);
         console.log("Sum of item price: ", sum);
       },
 
@@ -138,7 +179,24 @@ const createStore = () => {
         });
       },
 
+      getProducts(context) {
+        return this.$axios.$get("/read.php").then(data => {
+          for (let i = 0; i < data.records.length; i++) {
+            console.log("date says: ", data.records[i].date.substr(0, 10));
+            // Vue.set(
+            //   data.records[i],
+            //   data.records[i].date,
+            //   data.records[i].date.substr(0, 10)
+            // );
+            data.records[i].date = data.records[i].date.substr(0, 10);
+          }
+          context.commit("updateRecentSales", data.records);
+        });
+      },
+
       addProduct(context, product) {
+        // let date = new Date().toDateString();
+        console.log("Add product says: ", product);
         return this.$axios
           .$post("/create.php", product)
           .then(data => {
@@ -185,6 +243,18 @@ const createStore = () => {
         return state.products;
       },
 
+      sortedProducts(state) {
+        return function(date) {
+          let sortedProducts = [];
+          for (let a of state.products) {
+            if (a.date == date) {
+              sortedProducts.push(a);
+            }
+          }
+          return sortedProducts;
+        };
+      },
+
       dailyProductSum(state) {
         return state.dailyProductSum;
       },
@@ -206,12 +276,12 @@ const createStore = () => {
         return state.dailyItemSum;
       },
 
-      weeklyItemSum (state) {
-        return state.weeklyItemSum
+      weeklyItemSum(state) {
+        return state.weeklyItemSum;
       },
 
-      monthlyItemSum (state) {
-        return state.monthlyItemSum
+      monthlyItemSum(state) {
+        return state.monthlyItemSum;
       }
     }
   });

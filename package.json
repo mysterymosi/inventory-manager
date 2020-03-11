@@ -11,10 +11,16 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "@grapecity/spread-excelio": "^13.0.5",
+    "@grapecity/spread-sheets": "^13.0.5",
+    "@grapecity/spread-sheets-vue": "^13.0.5",
     "@nuxtjs/axios": "^5.9.5",
     "cookieparser": "^0.1.0",
+    "dhx-spreadsheet": "^3.1.4",
+    "file-saver": "^2.0.2",
     "js-cookie": "^2.2.1",
-    "nuxt": "^2.0.0"
+    "nuxt": "^2.0.0",
+    "vue-inject-js": "^1.0.0"
   },
   "devDependencies": {}
 }

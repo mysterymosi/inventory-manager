@@ -1,235 +1,128 @@
 <template>
-  <div class="row">
-    <div class="col-lg-12 col-md-8 col-sm-6">
-      <!-- <div class="white-box"> -->
-        <TablePanel :key="chartKey" title="Income Table" @onEndTheDay="endDay">
-          <gc-spread-sheets :hostClass="hostClass" @workbookInitialized="workbookInit">
-            <gc-worksheet
-              :dataSource="tableData"
-              :name="sheetName"
-              :autoGenerateColumns="autoGenerateColumns"
-            >
-              <!-- <gc-column
-                :width="50"
-                :dataField="'id'"
-                :headerText="'ID'"
-                :visible="visible"
-                :resizable="resizable"
-              ></gc-column> -->
-              <gc-column
-                :width="200"
-                :dataField="'prodname'"
-                :headerText="'Product Name'"
-                :visible="visible"
-                :resizable="resizable"
-              ></gc-column>
-              <gc-column
-                :width="320"
-                :headerText="'Product Price'"
-                :dataField="'prodprice'"
-                :visible="visible"
-                :resizable="resizable"
-              ></gc-column>
-              <!-- <gc-column
-                :width="100"
-                :dataField="'value'"
-                :headerText="'Value'"
-                :visible="visible"
-                :formatter="priceFormatter"
-                :resizable="resizable"
-              ></gc-column>
-              <gc-column
-                :width="100"
-                :dataField="'itemCount'"
-                :headerText="'Quantity'"
-                :visible="visible"
-                :resizable="resizable"
-              ></gc-column>
-              <gc-column
-                :width="100"
-                :dataField="'soldBy'"
-                :headerText="'Sold By'"
-                :visible="visible"
-                :resizable="resizable"
-              ></gc-column>
-              <gc-column
-                :width="100"
-                :dataField="'country'"
-                :headerText="'Country'"
-                :visible="visible"
-                :resizable="resizable"
-              ></gc-column> -->
-            </gc-worksheet>
-          </gc-spread-sheets>
-          <div class="dashboardRow">
-            <button class="btn btn-primary dashboardButton" @click="exportSheet">Export to Excel</button>
-            <div>
-              <b>Import Excel File:</b>
-              <div>
-                <input type="file" class="fileSelect" @change="fileChange($event)" />
-              </div>
-            </div>
-          </div>
-        </TablePanel>
-
-        <!-- <h3 class="box-title m-b-0">Income Page</h3>
-                <p class="text-muted m-b-30 font-13"> Enter Product Sold </p>
-                <AdminForm :product = "product" @handleAdd="addProducts"/>
-                
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="white-box">
-                <h3 class="box-title">Income Table <span style="float: right;">{{ date | dateFilter }}</span></h3>
-        <Table @onEndTheDay="handleEndTheDay"/>-->
-      <!-- </div> -->
+  <div>
+    <SpreadSheet
+      class="col-lg-8 col-md-8"
+      ref="spreadsheet"
+      :toolbar="toolbar"
+      :editLine="editLine"
+      :rowsCount="rowsCount"
+      :colsCount="colsCount"
+      :menu="menu"
+      @onEndDay="endTheDay"
+    />
+    <div class="card col-lg-4 col-md-4">
+      <div class="card-body">
+        <h1 class="card-title">Total Expenses</h1>
+        <h4 class="card-text">
+          <b>$</b>
+          {{ dailyProductSum[formattedDate] }}
+        </h4>
+        <!-- <AppButton>Go Somewhere</AppButton> -->
+      </div>
     </div>
   </div>
 </template>
 
-<!--<script> 
-// import AdminForm from '~/components/AdminForm'
-// import Table from '~/components/Table'
-// import TablePanel from "~/components/Tablepanel";
-
-// export default {
-//   layout: "dashboard",
-//   components: {
-//     AdminForm,
-//     Table
-//   },
-
-//   data() {
-//     return {
-//       date: new Date().toDateString(),
-//       product: {
-//         name: "",
-//         price: ""
-//       }
-//     };
-//   },
-
-//   methods: {
-//     addProducts() {
-//       this.$store.dispatch("addProduct", {
-//         prodname: this.product.name,
-//         prodprice: this.product.price
-//       });
-//       // console.log("expense says: ", this.product)
-//     },
-
-//     handleEndTheDay() {
-//       console.log("The day has ended");
-//       this.$store.commit("endTheDay", this.date);
-//     }
-//   }
-// };
-</script> -->
 <script>
-/* eslint-disable */
-import "@grapecity/spread-sheets/styles/gc.spread.sheets.excel2016colorful.css";
-
-// SpreadJS imports
-import "@grapecity/spread-sheets-vue";
-import Excel from "@grapecity/spread-excelio";
-import { saveAs } from "file-saver";
-
-import TablePanel from "~/components/TablePanel";
-import { extractSheetData } from "~/assets/js/util.js";
+import SpreadSheet from "~/components/spread";
+import { inputData } from "~/assets/js/util.js";
 
 export default {
-  components: { TablePanel },
-  // props: ["tableData"],
-  layout: 'dashboard',
+  layout: "dashboard",
+  components: {
+    SpreadSheet
+  },
   data() {
     return {
-      sheetName: "Sales Data",
-      hostClass: "spreadsheet",
-      autoGenerateColumns: true,
-      width: 200,
-      visible: true,
-      resizable: true,
-      priceFormatter: "$ #.00",
-      chartKey: 1,
+      toolbar: ["rows", "columns", "lock"],
+      editLine: true,
+      colsCount: 10,
+      rowsCount: 20,
+      menu: true,
       date: new Date().toDateString()
     };
   },
-
-  created () {
-    console.log('store', this.$store.state.products)
-  },
-
   computed: {
-      tableData () {
-          return this.$store.state.products
-      }
+    dailyProductSum() {
+      return this.$store.getters.dailyProductSum;
+    },
+
+    sortedProducts() {
+      return this.$store.getters.sortedProducts(this.formattedDate);
+    },
+
+    products() {
+      return this.$store.getters.products;
+    },
+
+    formattedDate() {
+      let date = new Date();
+      let formattedDate = ("0" + date.getDate()).slice(-2);
+      let month = date.getMonth() + 1;
+      let formattedMonth = ("0" + month).slice(-2);
+      console.log(
+        "date says: ",
+        date.getFullYear() + "-" + formattedMonth + "-" + formattedDate
+      );
+      let finalDate =
+        date.getFullYear() + "-" + formattedMonth + "-" + formattedDate;
+      return finalDate;
+    }
   },
 
   methods: {
-    workbookInit: function(spread) {
-      this._spread = spread;
-    },
-    fileChange: function(e) {
-      if (this._spread) {
-        const fileDom = e.target || e.srcElement;
-        const excelIO = new Excel.IO();
-        const spread = this._spread;
-        const store = this.$store;
-
-        const deserializationOptions = {
-          frozenRowsAsColumnHeaders: true
-        };
-
-        excelIO.open(fileDom.files[0], data => {
-          console.dir(extractSheetData(data));
-          const newSalesData = extractSheetData(data);
-          store.commit("updateRecentSales", newSalesData);
-        });
-      }
-    },
-    exportSheet: function() {
-      const spread = this._spread;
-      const fileName = "SalesData.xlsx";
-
-      const sheet = spread.getSheet(0);
-      const excelIO = new Excel.IO();
-      const json = JSON.stringify(
-        spread.toJSON({
-          includeBindingSource: true,
-          columnHeadersAsFrozenRows: true
-        })
-      );
-      console.log('JSON data says: ', json)
-
-      excelIO.save(
-        json,
-        blob => {
-          saveAs(blob, fileName);
-        },
-        function(e) {
-          alert(e);
-        }
-      );
-    },
-
-    endDay () {
-      console.log("Day ended")
-      this.$store.commit('endTheDay', this.date)
+    endTheDay() {
+      this.$store.commit("endTheDay", this.date);
     }
+  },
+
+  mounted() {
+    let sheet = this.$refs.spreadsheet;
+    let names = {};
+    let prices = {};
+    let r = 1;
+    console.log("this.format: ", this.formattedDate);
+    let ins = this;
+    sheet.spreadsheet.events.on("AfterValueChange", function(cell, value) {
+      if (r == 2) {
+        // So it doesn't print out the values twice
+        if (cell.startsWith("A")) {
+          names[cell] = value;
+
+          if (prices["B" + cell.substr(1, 1)]) {
+            let prod = {
+              prodname: value,
+              prodprice: prices["B" + cell.substr(1, 1)]
+            };
+            ins.$store.dispatch("addProduct", prod);
+            console.log("prod says: ", prod);
+          }
+        }
+
+        if (cell.startsWith("B")) {
+          prices[cell] = value;
+          if (names["A" + cell.substr(1, 1)]) {
+            let prod = {
+              prodname: names["A" + cell.substr(1, 1)],
+              prodprice: value
+            };
+            ins.$store.dispatch("addProduct", prod);
+          }
+        }
+
+        r = 1;
+      } else {
+        r = 2;
+      }
+    });
+    this.$store.dispatch("getProducts").then(data => {
+      sheet.spreadsheet.parse(inputData(this.sortedProducts, "Product"));
+      sheet.spreadsheet.lock("A1:B1");
+      this.$store.commit("endTheDay", this.formattedDate);
+    });
   }
 };
 </script>
 
 <style scoped>
-.spreadsheet {
-  width: 100%;
-  height: 400px;
-  border: 1px solid lightgray;
-}
-
-.fileSelect {
-  width: 100%;
-  margin-top: 20px;
-}
 </style>
-

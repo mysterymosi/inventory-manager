@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header />
-    <div class="card mb-3" style="max-width: 300px; margin:10% auto;">
+    <div class="card mb-3" style="max-width: 300px; margin:2% auto;">
       <!-- <img src="../assets/img/img3.jpeg" class="card-img" alt="...">    -->
       <div class="card-body">
         <h5 class="card-title" style="padding-left: 10px;">Sign Up</h5>
@@ -57,7 +57,7 @@
           <button type="submit" @click.prevent="signup" class="btn btn-success">Submit</button>
         </form>
         <p class="card-text">
-          <router-link to="/login">Already have an account? Log in</router-link>
+          <nuxt-link to="/login">Already have an account? Log in</nuxt-link>
         </p>
       </div>
     </div>
@@ -65,39 +65,41 @@
 </template>
 
 <script>
-import Header from "~/components/Header";
+import Header from "~/components/NewHeader";
 export default {
   components: {
     Header
   },
 
-  data () {
+  data() {
     return {
       userData: {
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: ''
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: ""
       }
-    }
+    };
   },
 
   methods: {
-    signup () {
+    signup() {
       let info = {
-        firstname: this.userData['firstName'],
-        lastname: this.userData['lastName'],
-        email: this.userData['email'],
-        password: this.userData['password']
-      } 
+        firstname: this.userData["firstName"],
+        lastname: this.userData["lastName"],
+        email: this.userData["email"],
+        password: this.userData["password"]
+      };
 
-      this.$store.dispatch('signup', info)
-      .then ((data) => {
-        console.log(`Response: ${JSON.stringify(data)}`)
-        this.$router.push('Login')
-      }).catch((err)=>{
-        console.log(`Error from signup: ${err}`)
-      })
+      this.$store
+        .dispatch("signup", info)
+        .then(data => {
+          console.log(`Response: ${JSON.stringify(data)}`);
+          this.$router.push("Login");
+        })
+        .catch(err => {
+          console.log(`Error from signup: ${err}`);
+        });
     }
   }
 };

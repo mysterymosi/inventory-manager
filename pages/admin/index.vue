@@ -15,7 +15,7 @@
               <sup>
                 <i class="ti-arrow-up text-success"></i>
               </sup>
-              {{ dailySum[date] }}
+              {{ dailySum[formattedDate] }}
             </h1>
           </div>
         </div>
@@ -144,7 +144,19 @@ export default {
 
   computed: {
     //INCOME COMPUTED PROPERTIES
-    
+    formattedDate() {
+      let date = new Date();
+      let formattedDate = ("0" + date.getDate()).slice(-2);
+      let month = date.getMonth() + 1;
+      let formattedMonth = ("0" + month).slice(-2);
+      console.log(
+        "date says: ",
+        date.getFullYear() + "-" + formattedMonth + "-" + formattedDate
+      );
+      let finalDate =
+        date.getFullYear() + "-" + formattedMonth + "-" + formattedDate;
+      return finalDate;
+    },
 
     dailySum() {
       return this.$store.getters.dailyProductSum;

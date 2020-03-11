@@ -12,6 +12,9 @@
 <script>
 import AppButton from '~/components/UI/AppButton'
 export default {
-  props: ["title"]
+  props: ["title"],
+  components: {
+    AppButton
+  }
 }
 </script>
