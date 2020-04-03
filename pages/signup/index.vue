@@ -7,17 +7,17 @@
         <h5 class="card-title" style="padding-left: 10px;">Sign Up</h5>
         <form style="padding: 10px;">
           <div class="form-group">
-            <label for="firstName">First Name</label>
+            <label for="firstName">Name</label>
             <input
-              v-model="userData.firstName"
+              v-model="userData.name"
               type="text"
               class="form-control"
               id="firstName"
               aria-describedby="emailHelp"
-              placeholder="Enter First Name"
+              placeholder="Enter Name"
             />
           </div>
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label for="LastName">Last Name</label>
             <input
               v-model="userData.lastName"
@@ -27,7 +27,7 @@
               aria-describedby="emailHelp"
               placeholder="Enter Last Name"
             />
-          </div>
+          </div>-->
           <div class="form-group">
             <label for="exampleInputEmail1">Email address</label>
             <input
@@ -53,6 +53,16 @@
               placeholder="Password"
             />
           </div>
+          <div class="form-group">
+            <label for="exampleInputPassword2">Confirm Password</label>
+            <input
+              v-model="userData.confirm_pass"
+              type="password"
+              class="form-control"
+              id="exampleInputPassword2"
+              placeholder="Confirm Password"
+            />
+          </div>
 
           <button type="submit" @click.prevent="signup" class="btn btn-success">Submit</button>
         </form>
@@ -74,10 +84,10 @@ export default {
   data() {
     return {
       userData: {
-        firstName: "",
-        lastName: "",
+        name: "",
         email: "",
-        password: ""
+        password: "",
+        confirm_pass: ""
       }
     };
   },
@@ -85,17 +95,23 @@ export default {
   methods: {
     signup() {
       let info = {
-        firstname: this.userData["firstName"],
-        lastname: this.userData["lastName"],
+        name: this.userData["name"],
         email: this.userData["email"],
-        password: this.userData["password"]
+        password: this.userData["password"],
+        confirm_pass: this.userData["confirm_pass"]
       };
 
       this.$store
         .dispatch("signup", info)
         .then(data => {
-          console.log(`Response: ${JSON.stringify(data)}`);
-          this.$router.push("Login");
+          if (data.status) {
+            console.log(`Response: ${JSON.stringify(data)}`);
+            this.$router.push("Login");
+          } else {
+            for (let i in data.error) {
+              console.log(data.error[i].toString());
+            }
+          }
         })
         .catch(err => {
           console.log(`Error from signup: ${err}`);

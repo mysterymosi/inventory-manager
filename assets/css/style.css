@@ -3712,7 +3712,7 @@ ul.common li a:hover {
 .table > tfoot > tr > th,
 .table > thead > tr > td,
 .table > thead > tr > th {
-  padding: 15px 8px;
+  padding: 15px 15px 15px 15px;
 }
 .table-bordered > thead > tr > th,
 .table-bordered > tbody > tr > th,

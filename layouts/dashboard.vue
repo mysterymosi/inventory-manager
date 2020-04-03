@@ -44,7 +44,10 @@ export default {
       {
         src: "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"
       },
-      { src: "js/bootstrap.min.js" },
+      {
+        src:
+          "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+      },
       { src: "js/jquery.slimscroll.js" },
       { src: "js/waves.js" },
       { src: "js/custom.min.js" }
@@ -62,7 +65,8 @@ export default {
 @import url("~/assets/bootstrap/dist/css/bootstrap.min.css");
 
 .beans {
-  margin-top: 7%;
+  margin-top: 8%;
+  margin-bottom: 7%;
 }
 
 #page-wrapper {

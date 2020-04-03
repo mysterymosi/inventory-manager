@@ -64,7 +64,7 @@ export default {
           email: this.email,
           password: this.password
         })
-        .then(data => {
+        .then(() => {
           this.$router.push("/admin");
         });
     }

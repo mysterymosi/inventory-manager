@@ -17,7 +17,8 @@ export default {
     editLine: { type: Boolean, default: true },
     menu: Boolean,
     rowsCount: Number,
-    colsCount: Number
+    colsCount: Number,
+    type: String
   },
 
   data() {
@@ -44,11 +45,18 @@ export default {
       exportModulePath: "https://cdn.dhtmlx.com/libs/json2excel/1.0/worker.js",
       importModulePath: "https://cdn.dhtmlx.com/libs/excel2json/1.0/worker.js"
     });
+    console.log("sss", this.type);
 
     // console.log("json to excel: ", json2excel(this.items, this.rowsCount));
     this.spreadsheet.parse([
-      { cell: "A1", value: "Product Name" },
-      { cell: "B1", value: "Product Price" }
+      {
+        cell: "A1",
+        value: this.type == "income" ? "Product Name" : "Item Name"
+      },
+      {
+        cell: "B1",
+        value: this.type == "income" ? "Product Price" : "Item Price"
+      }
     ]);
     // this.spreadsheet.parse(this.items);
     // this.spreadsheet.events.on("AfterValueChange", function(cell, value) {

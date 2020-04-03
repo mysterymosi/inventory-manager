@@ -20,21 +20,33 @@ const createStore = () => {
       // incomeProducts: {},
       //INCOME STATES
       products: [
-        // { prodname: "Beans", prodprice: 1000 },
-        // { prodname: "Toad", prodprice: 2000 },
-        // { prodname: "Rice", prodprice: 3000 }
+        { id: 1, prodname: "Beans", prodquan: 30, prodprice: 1000 },
+        { id: 2, prodname: "Fish", prodquan: 20, prodprice: 2000 },
+        { id: 3, prodname: "Meat", prodquan: 40, prodprice: 4000 },
+        { id: 4, prodname: "Egg", prodquan: 10, prodprice: 50 },
+        { id: 5, prodname: "Milk", prodquan: 50, prodprice: 1980 },
+        { id: 6, prodname: "Shirts", prodquan: 20, prodprice: 2000 },
+        { id: 7, prodname: "Pants", prodquan: 24, prodprice: 4000 },
+        { id: 8, prodname: "Plates", prodquan: 44, prodprice: 2000 },
+        { id: 9, prodname: "Ketchup", prodquan: 66, prodprice: 500 },
+        { id: 10, prodname: "Bread", prodquan: 23, prodprice: 300 },
+        { id: 11, prodname: "Cake", prodquan: 45, prodprice: 400 },
+        { id: 12, prodname: "Shrimp", prodquan: 12, prodprice: 1000 },
+        { id: 13, prodname: "Rice", prodquan: 19, prodprice: 3000 }
       ],
+      sales: [],
       sortedProducts: [],
       dailyProductSum: {},
       weeklyProductSum: {},
       monthlyProductSum: {},
 
       //EXPENSE STATES
-      items: [
+      expenses: [
         // { prodname: "Fuel", prodprice: 1000 },
         // { prodname: "Glassware", prodprice: 2000 },
         // { prodname: "Water dispensers", prodprice: 8000 }
       ],
+      finalExpense: [],
       dailyItemSum: {},
       weeklyItemSum: {},
       monthlyItemSum: {},
@@ -56,10 +68,37 @@ const createStore = () => {
         console.log("Sum of product price: ", sum);
       },
 
+      editProduct(state, payload) {
+        for (let i in state.products) {
+          if (Number(state.products[i].id) === Number(payload.id)) {
+            state.products[i] = payload;
+          }
+        }
+      },
+
+      deleteProduct(state, payload) {
+        for (let i in state.products) {
+          if (+state.products[i].id === +payload) {
+            state.products.splice(i, 1);
+            console.log("state says: ", state.products);
+          }
+        }
+      },
+
+      addSales(state, payload) {
+        state.sales.push(payload);
+        console.log("Sales from state says: ", state.sales);
+      },
+
+      addProducts(state, payload) {
+        state.products = payload;
+        console.log("inventory from state says: ", state.products);
+      },
+
       updateRecentSales(state, payload) {
         console.log("payload: ", payload);
-        state.products = payload;
-        console.log("state says: ", state.products);
+        state.sales = payload;
+        console.log("state says: ", state.sales);
       },
 
       //compute the sum of the price of pruducts for that day
@@ -106,10 +145,10 @@ const createStore = () => {
       //EXPENSE MUTATIONS
       addItem(state, item) {
         let date = new Date().toDateString();
-        state.items.push(item);
-        console.log("Item says: ", JSON.stringify(state.items));
+        state.expenses.push(item);
+        console.log("Item says: ", JSON.stringify(state.expenses));
         var sum = 0;
-        state.items.forEach(item => {
+        state.expenses.forEach(item => {
           sum += +item.prodprice;
         });
         // state.dailyItemSum[date] = sum;
@@ -117,15 +156,21 @@ const createStore = () => {
         console.log("Sum of item price: ", sum);
       },
 
+      addExpense(state, payload) {
+        console.log("payload says: ", payload);
+        state.finalExpense = state.expenses.concat(payload);
+        console.log("expenses says: ", state.finalExpense);
+      },
+
       updateRecentExpenses(state, payload) {
         console.log("payload: ", payload);
-        state.items = payload;
+        state.expenses = payload;
         console.log("state.items says: ", state.items);
       },
 
       endExpenseDay(state, date) {
         var sum = 0;
-        state.items.forEach(item => {
+        state.expenses.forEach(item => {
           let price = +item.prodprice;
           console.log("price says: ", price);
           sum += price;
@@ -156,21 +201,21 @@ const createStore = () => {
 
     actions: {
       signup(context, info) {
-        return this.$axios.$post("/create_users.php", info);
+        return this.$axios.$post("/register", info);
       },
 
       login(context, info) {
-        return this.$axios.$post("/login.php", info).then(data => {
-          if (data.success) {
-            console.log(`Response: ${JSON.stringify(data.userData)}`);
-            context.commit("setProfile", data.userData);
-            console.log("data.jwt: ", data.jwt);
-            context.commit("setToken", data.jwt);
-            localStorage.setItem("access_token", data.jwt);
-            localStorage.setItem("user_email", data.userData.email);
-            localStorage.setItem("user", JSON.stringify(data.userData));
-            Cookie.set("access_token", data.jwt);
-            Cookie.set("user", data.userData);
+        return this.$axios.$post("/login", info).then(data => {
+          if (data.status) {
+            console.log(`Response: ${JSON.stringify(data.data.user)}`);
+            context.commit("setProfile", data.data.user);
+            console.log("data.jwt: ", data.data.token);
+            context.commit("setToken", data.data.token);
+            localStorage.setItem("access_token", data.data.token);
+            localStorage.setItem("user_email", data.data.user.email);
+            localStorage.setItem("user", JSON.stringify(data.data.user));
+            Cookie.set("access_token", data.data.token);
+            Cookie.set("user", data.data.user);
             console.log(
               "localStorage says beans",
               localStorage.getItem("access_token")
@@ -179,18 +224,41 @@ const createStore = () => {
         });
       },
 
-      getProducts(context) {
-        return this.$axios.$get("/read.php").then(data => {
-          for (let i = 0; i < data.records.length; i++) {
-            console.log("date says: ", data.records[i].date.substr(0, 10));
-            // Vue.set(
-            //   data.records[i],
-            //   data.records[i].date,
-            //   data.records[i].date.substr(0, 10)
-            // );
-            data.records[i].date = data.records[i].date.substr(0, 10);
+      //get today's income log on mount
+      getTodaySales(context) {
+        return this.$axios.$get("/search_by_date.php").then(data => {
+          if (data.message) {
+            console.log("sales data says: ", data.message);
+            for (let i = 0; i < data.message.length; i++) {
+              console.log("date says: ", data.message[i].date.substr(0, 10));
+              data.message[i].date = data.message[i].date.substr(0, 10);
+            }
+            context.commit("updateRecentSales", data.message);
           }
-          context.commit("updateRecentSales", data.records);
+        });
+      },
+
+      getPriceSum(context) {
+        return this.$axios.$get("/save_total.php").then(data => {
+          console.log("Price sum says: ", data);
+        });
+      },
+
+      getProducts(context) {
+        return this.$axios.$get("/products").then(data => {
+          // for (let i = 0; i < data.records.length; i++) {
+          //   console.log("date says: ", data.records[i].date.substr(0, 10));
+          //   data.records[i].date = data.records[i].date.substr(0, 10);
+          // }
+          context.commit("addProducts", data);
+          console.log("data says: ", data);
+        });
+      },
+
+      addSales(context, product) {
+        return this.$axios.$post("/sales", product).then(data => {
+          console.log("sales data says: ", data);
+          // context.commit('addSales', )
         });
       },
 
@@ -198,16 +266,16 @@ const createStore = () => {
         // let date = new Date().toDateString();
         console.log("Add product says: ", product);
         return this.$axios
-          .$post("/create.php", product)
+          .$post("/products", product)
           .then(data => {
             console.log("Data says: ", data);
-            if (data.status) {
-              product.id = data.id;
-              context.commit("addProduct", product);
-              console.log("Successfully added products");
-            } else {
-              console.log("Error adding products ", data.message);
-            }
+            // if (data.status) {
+            //   product.id = data.id;
+            //   context.commit("addProduct", product);
+            //   console.log("Successfully added products");
+            // } else {
+            //   console.log("Error adding products ", data.message);
+            // }
           })
           .catch(err => {
             console.log("Error says: ", err);
@@ -237,10 +305,31 @@ const createStore = () => {
       profile(state) {
         return state.profile;
       },
+      product(state) {
+        return function(prodId) {
+          for (let product of state.products) {
+            if (Number(product.id) === Number(prodId)) {
+              return product;
+            }
+          }
+        };
+      },
+
+      sales(state) {
+        return state.sales;
+      },
 
       //INCOME GETTERS
       products(state) {
         return state.products;
+      },
+
+      someProducts(state) {
+        let arr = [];
+        for (let i = 0; i < 10; i++) {
+          arr.push(state.products[i]);
+        }
+        return arr;
       },
 
       sortedProducts(state) {
@@ -269,7 +358,7 @@ const createStore = () => {
 
       //EXPENSE GETTERS
       items(state) {
-        return state.items;
+        return state.expenses;
       },
 
       dailyItemSum(state) {
