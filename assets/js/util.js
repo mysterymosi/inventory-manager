@@ -38,7 +38,7 @@ export const inputData = (data, state) => {
     },
     {
       cell: "B1",
-      value: `${state.charAt(0).toUpperCase() + state.slice(1)} Name`
+      value: `${state.charAt(0).toUpperCase() + state.slice(1)} Price`
     }
   ];
 
@@ -64,4 +64,11 @@ export const formattedDate = function() {
   let finalDate =
     date.getFullYear() + "-" + formattedMonth + "-" + formattedDate;
   return finalDate;
+};
+
+export const isEmpty = function(obj) {
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) return false;
+  }
+  return true;
 };

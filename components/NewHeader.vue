@@ -75,9 +75,7 @@
         <li class="dropdown">
           <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="javascript:void(0)">
             <img src="~assets/images/users/varun.jpg" alt="user-img" width="36" class="img-circle" />
-            <b
-              class="hidden-xs"
-            >{{ profile.firstName.charAt(0).toUpperCase() + profile.firstName.slice(1) }}</b>
+            <b class="hidden-xs">{{ profile.name.charAt(0).toUpperCase() + profile.name.slice(1) }}</b>
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu dropdown-user animated flipInY">
@@ -87,7 +85,7 @@
                   <img src="~assets/images/users/varun.jpg" alt="user" />
                 </div>
                 <div class="u-text">
-                  <h4>{{ profile.firstName.charAt(0).toUpperCase() + profile.firstName.slice(1) }} {{ profile.lastName.charAt(0).toUpperCase() + profile.lastName.slice(1) }}</h4>
+                  <h4>{{ profile.name.charAt(0).toUpperCase() + profile.name.slice(1) }}</h4>
                   <p class="text-muted">{{ profile.email }}</p>
                   <a href="profile.html" class="btn btn-rounded btn-danger btn-sm">View Profile</a>
                 </div>
@@ -127,6 +125,7 @@
         <!-- /.dropdown -->
       </ul>
     </div>
+
     <!-- /.navbar-header -->
     <!-- /.navbar-top-links -->
     <!-- /.navbar-static-side -->

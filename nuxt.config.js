@@ -34,7 +34,7 @@ export default {
    ** Global CSS
    */
   css: [
-    // '~/assets/css/style.css',
+    "~assets/css/anime.css"
     // "@grapecity/spread-sheets/styles/gc.spread.sheets.excel2016colorful.css"
   ],
   /*
@@ -51,7 +51,9 @@ export default {
   modules: ["@nuxtjs/axios"],
 
   axios: {
-    baseURL: "http://localhost/my-first-nuxt-app/server/api_product/product"
+    // baseURL: "http://localhost/my-first-nuxt-app/server/inventory-manager-api"
+    baseURL: "http://127.0.0.1:8000/api"
+    // baseURL: "http://localhost/my-first-nuxt-app/server/api_product/product"
   },
 
   env: {
@@ -65,5 +67,10 @@ export default {
      ** You can extend webpack config here
      */
     extend(config, ctx) {}
+  },
+
+  transition: {
+    name: "fade",
+    mode: "out-in"
   }
 };

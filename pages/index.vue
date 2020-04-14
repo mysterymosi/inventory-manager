@@ -7,7 +7,7 @@
           <h1>The Books</h1>
           <h3>Keep Records Make You No Fall Hands</h3>
           <hr />
-          <nuxt-link to="/signup" class="btn btn-success btn-lg">
+          <nuxt-link :to="checkAuth" class="btn btn-success btn-lg">
             <i class="fa fa-thumbs-up"></i> Get Started!
           </nuxt-link>
         </div>
@@ -23,6 +23,19 @@ import NewHeader from "~/components/NewHeader";
 export default {
   components: {
     NewHeader
+  },
+
+  computed: {
+    profile() {
+      return this.$store.getters.profile;
+    },
+
+    checkAuth() {
+      if (!this.profile.email) {
+        return "/signup";
+      }
+      return "/admin";
+    }
   },
 
   layout: "landing"
