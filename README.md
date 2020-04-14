@@ -1,4 +1,4 @@
-# my-first-nuxt-app
+# Inventory Manager
 
 > My prime Nuxt.js project
 
