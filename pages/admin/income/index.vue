@@ -154,8 +154,8 @@ export default {
         product_name: this.product.name,
         quantity: this.product.quantity,
         price: this.product.price,
-        user_id: this.profile.id,
-        token: localStorage.getItem("access_token")
+        user_id: this.profile.id
+        // token: localStorage.getItem("access_token")
       });
 
       this.product = {

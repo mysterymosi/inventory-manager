@@ -256,10 +256,19 @@ const createStore = () => {
       },
 
       addSales(context, product) {
-        return this.$axios.$post("/sales", product).then(data => {
-          console.log("sales data says: ", data);
-          // context.commit('addSales', )
-        });
+        console.log("Product before says: ", product);
+        let token = localStorage.getItem("access_token");
+
+        return this.$axios
+          .$post("/sales", product, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          .then(data => {
+            if (data.status) {
+              console.log("sales data says: ", data);
+            }
+            // context.commit('addSales', )
+          });
       },
 
       addProduct(context, product) {
@@ -268,7 +277,9 @@ const createStore = () => {
         return this.$axios
           .$post("/products", product)
           .then(data => {
-            console.log("Data says: ", data);
+            if (data.status) {
+              console.log("Data says: ", data);
+            }
             // if (data.status) {
             //   product.id = data.id;
             //   context.commit("addProduct", product);

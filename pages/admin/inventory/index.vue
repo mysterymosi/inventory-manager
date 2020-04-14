@@ -79,10 +79,12 @@ export default {
 
   methods: {
     handleAdd() {
-      this.$store.commit("addProduct", {
-        prodname: this.product.name,
-        prodprice: this.product.price,
-        prodquan: this.product.quantity
+      this.$store.dispatch("addProduct", {
+        product_name: this.product.name,
+        product_price: this.product.price,
+        quantity: this.product.quantity,
+        user_id: JSON.parse(localStorage.getItem("user")).id,
+        token: localStorage.getItem("access_token")
       });
 
       this.product = {
