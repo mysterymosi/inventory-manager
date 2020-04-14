@@ -1,6 +1,6 @@
 # Inventory Manager
 
-> My prime Nuxt.js project
+> Helps you keep track of your incoming monies and expenses.
 
 ## Build Setup
 
